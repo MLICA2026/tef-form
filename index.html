@@ -104,25 +104,27 @@
 
   <form id="form">
     <div class="date-row">
-      <label>Date de la session :</label>
-      <input type="date" name="session_date" required>
+      <label>Date de la session <span class="req">*</span></label>
+      <select name="session_date" id="session_date" required style="max-width:220px;">
+        <option value="">— Choisir une date —</option>
+      </select>
     </div>
 
     <div class="section">Choix du test</div>
     <div class="exam-grid" style="grid-template-columns:1fr 1fr;">
-      <div class="exam-col">
-        <h4>TEFAQ</h4>
-        <label><input type="checkbox" name="tefaq" value="comprehension_ecrite" data-price="140" class="price-check"> Compréhension écrite</label>
-        <label><input type="checkbox" name="tefaq" value="comprehension_orale" data-price="140" class="price-check"> Compréhension orale</label>
-        <label><input type="checkbox" name="tefaq" value="expression_ecrite" data-price="70" class="price-check"> Expression écrite</label>
-        <label><input type="checkbox" name="tefaq" value="expression_orale" data-price="70" class="price-check"> Expression orale</label>
-      </div>
       <div class="exam-col">
         <h4>TEF Canada</h4>
         <label><input type="checkbox" name="tefcanada" value="comprehension_ecrite" data-price="140" class="price-check"> Compréhension écrite</label>
         <label><input type="checkbox" name="tefcanada" value="comprehension_orale" data-price="140" class="price-check"> Compréhension orale</label>
         <label><input type="checkbox" name="tefcanada" value="expression_ecrite" data-price="70" class="price-check"> Expression écrite</label>
         <label><input type="checkbox" name="tefcanada" value="expression_orale" data-price="70" class="price-check"> Expression orale</label>
+      </div>
+      <div class="exam-col">
+        <h4>TEFAQ</h4>
+        <label><input type="checkbox" name="tefaq" value="comprehension_ecrite" data-price="140" class="price-check"> Compréhension écrite</label>
+        <label><input type="checkbox" name="tefaq" value="comprehension_orale" data-price="140" class="price-check"> Compréhension orale</label>
+        <label><input type="checkbox" name="tefaq" value="expression_ecrite" data-price="70" class="price-check"> Expression écrite</label>
+        <label><input type="checkbox" name="tefaq" value="expression_orale" data-price="70" class="price-check"> Expression orale</label>
       </div>
     </div>
 
@@ -147,14 +149,14 @@
       <div class="field"><label>Pays de la nationalité <span class="req">*</span></label><input type="text" name="pays_nationalite" required></div>
     </div>
     <div class="row">
-      <div class="field"><label>Langue maternelle</label><input type="text" name="langue_maternelle" required></div>
+      <div class="field"><label>Langue maternelle <span class="req">*</span></label><input type="text" name="langue_maternelle" required></div>
     </div>
     <div class="row">
-      <div class="field"><label>Adresse</label><input type="text" name="adresse" required></div>
+      <div class="field"><label>Adresse <span class="req">*</span></label><input type="text" name="adresse" required></div>
     </div>
     <div class="row c3">
-      <div class="field"><label>Code postal</label><input type="text" name="code_postal" required></div>
-      <div class="field"><label>Ville</label><input type="text" name="ville" required></div>
+      <div class="field"><label>Code postal <span class="req">*</span></label><input type="text" name="code_postal" required></div>
+      <div class="field"><label>Ville <span class="req">*</span></label><input type="text" name="ville" required></div>
       <div class="field"><label>Pays <span class="req">*</span></label><input type="text" name="pays" required></div>
     </div>
     <div class="row c2">
@@ -179,14 +181,14 @@
     <div class="section">Règlement</div>
     <div class="row" style="max-width:300px">
       <div class="field">
-        <label>Montant de l'inscription (CAD$) — calculé automatiquement</label>
+        <label>Montant de l'inscription (CAD$) — calculé automatiquement <span class="req">*</span></label>
         <input type="text" name="montant" required id="montant" placeholder="0.00" readonly style="background:#f0f0f0;font-weight:600;color:#2e2060;">
       </div>
     </div>
     <div class="pay-row">
-      <label><input type="radio" name="paiement" value="cheque"> Chèque</label>
-      <label><input type="radio" name="paiement" value="carte_credit"> Carte de crédit</label>
-      <label><input type="radio" name="paiement" value="especes"> Espèces</label>
+      <label><input type="radio" name="paiement" value="etransfer" required> E-transfer</label>
+      <label><input type="radio" name="paiement" value="carte_credit"> Carte de crédit (à l'école)</label>
+      <label><input type="radio" name="paiement" value="especes"> Espèces (à l'école)</label>
     </div>
 
     <div class="cert">
@@ -199,9 +201,9 @@
     </div>
 
     <div class="row c3" style="margin-top:16px">
-      <div class="field"><label>Signé à</label><input type="text" name="signe_a" required placeholder="Ville"></div>
-      <div class="field"><label>Le (date)</label><input type="date" name="signe_le" required></div>
-      <div class="field"><label>Signature (Nom prénom)</label><input type="text" name="signature" required></div>
+      <div class="field"><label>Signé à <span class="req">*</span></label><input type="text" name="signe_a" required placeholder="Ville"></div>
+      <div class="field"><label>Le (date) <span class="req">*</span></label><input type="date" name="signe_le" required></div>
+      <div class="field"><label>Signature (Nom prénom) <span class="req">*</span></label><input type="text" name="signature" required></div>
     </div>
 
     <p class="note">* Tous les champs sont obligatoires</p>
@@ -215,6 +217,47 @@
 </div>
 
 <script>
+// Generate last Saturdays of next 6 months
+function getLastSaturdays(count) {
+  const dates = [];
+  const now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth(); // 0-based
+
+  for (let i = 0; i < count; i++) {
+    // Find last day of month
+    const lastDay = new Date(year, month + 1, 0);
+    // Go back to last Saturday (day 6)
+    const diff = (lastDay.getDay() - 6 + 7) % 7;
+    const lastSat = new Date(lastDay);
+    lastSat.setDate(lastDay.getDate() - diff);
+
+    // Only include future dates
+    if (lastSat >= now) {
+      dates.push(lastSat);
+    }
+
+    month++;
+    if (month > 11) { month = 0; year++; }
+  }
+  return dates;
+}
+
+function populateSessionDates() {
+  const sel = document.getElementById('session_date');
+  const dates = getLastSaturdays(8);
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  dates.forEach(d => {
+    const opt = document.createElement('option');
+    const label = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    const value = d.toISOString().split('T')[0];
+    opt.value = value;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+populateSessionDates();
+
 // Auto-calculate price
 function updatePrice() {
   const checks = document.querySelectorAll('.price-check:checked');
