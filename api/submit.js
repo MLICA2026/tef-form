@@ -23,7 +23,7 @@ async function buildPDF(data) {
   // TEF logo (left)
   try {
     const tefBytes = Buffer.from(LOGO_B64, 'base64');
-    const tefImg   = await pdfDoc.embedPng(tefBytes);
+    const tefImg   = await pdfDoc.embedJpg(tefBytes);
     const tefDims  = tefImg.scaleToFit(90, logoHeight);
     page.drawImage(tefImg, { x: 40, y: y - tefDims.height + 5, width: tefDims.width, height: tefDims.height });
   } catch(e) {
@@ -43,9 +43,7 @@ async function buildPDF(data) {
   y -= 10;
 
   // Address line under logos
-  page.drawText('259 rue Yorkland, bureau #212, North York, M2J 5B2, Toronto', { x: 40, y, font: fontReg, size: 8, color: rgb(0.5, 0.5, 0.5) });
-  page.drawText('tef@mlicanada.ca', { x: width - 120, y, font: fontReg, size: 8, color: rgb(0.5, 0.5, 0.5) });
-  y -= 16;
+  y -= 4;
 
   // ── main title ────────────────────────────────────────────────────────────
   const title = "Fiche d'inscription simplifiée";
@@ -75,10 +73,8 @@ async function buildPDF(data) {
   sectionBar('Choix du test');
 
   const cols = [
-    { label: 'TEF',             key: 'tef',            items: ['comprehension_ecrite','comprehension_orale','lexique_structure','expression_ecrite','expression_orale'] },
-    { label: 'TEFAQ',           key: 'tefaq',          items: ['comprehension_ecrite','comprehension_orale','expression_ecrite','expression_orale'] },
     { label: 'TEF Canada',      key: 'tefcanada',      items: ['comprehension_ecrite','comprehension_orale','expression_ecrite','expression_orale'] },
-    { label: 'TEF Intégration', key: 'tefintegration', items: ['all'] },
+    { label: 'TEFAQ',           key: 'tefaq',          items: ['comprehension_ecrite','comprehension_orale','expression_ecrite','expression_orale'] },
   ];
   const labels = {
     comprehension_ecrite: 'Compréhension écrite',
@@ -88,7 +84,7 @@ async function buildPDF(data) {
     expression_orale:     'Expression orale',
     all:                  'Toutes épreuves',
   };
-  const colW   = (width - 80) / 4;
+  const colW   = (width - 80) / 2;
   const examY  = y;
 
   cols.forEach((col, ci) => {
@@ -103,7 +99,7 @@ async function buildPDF(data) {
       iy -= 12;
     });
   });
-  y = examY - 13 - 5 * 12 - 10;
+  y = examY - 13 - 4 * 12 - 10;
 
   // ── état civil ────────────────────────────────────────────────────────────
   sectionBar('État civil');
@@ -162,9 +158,9 @@ async function buildPDF(data) {
 
   // ── règlement ─────────────────────────────────────────────────────────────
   sectionBar('Règlement');
-  field("Montant de l'inscription", data.montant ? data.montant + ' €' : '', 40, 150);
+  field("Montant de l'inscription", data.montant || '', 40, 150);
   y -= 26;
-  ['cheque:Chèque','carte_credit:Carte de crédit','especes:Espèces'].forEach((p, i) => {
+  ['etransfer:E-transfer','carte_credit:Carte de crédit (à l\'école)','especes:Espèces (à l\'école)'].forEach((p, i) => {
     const [val, label] = p.split(':');
     const tick = data.paiement === val ? '(*)' : '( )';
     page.drawText(tick + ' ' + label, { x: 40 + i * 130, y, font: fontReg, size: 10, color: rgb(0.2, 0.2, 0.2) });
@@ -237,14 +233,23 @@ module.exports = async (req, res) => {
         subject: `Confirmation d'inscription TEF — ${studentName}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-            <div style="background:#f8f9fa;padding:20px 24px;border-bottom:3px solid #2e73b6;display:flex;align-items:center;justify-content:space-between;">
-              <img src="https://tef-form.vercel.app/tef-logo.png" alt="TEF" style="height:45px;" />
-              <img src="https://tef-form.vercel.app/mli-logo.jpg" alt="MLI" style="height:45px;" />
+            <div style="background:#f8f9fa;padding:16px 24px;border-bottom:3px solid #2e73b6;display:flex;align-items:center;justify-content:space-between;">
+              <img src="data:image/jpeg;base64,${LOGO_B64}" alt="TEF" style="height:50px;object-fit:contain;" />
+              <img src="data:image/jpeg;base64,${MLI_LOGO_B64}" alt="MLI" style="height:45px;object-fit:contain;" />
             </div>
             <div style="padding:24px;">
               <h2 style="color:#2e2060;margin-top:0">Bonjour ${data.prenom || ''},</h2>
               <p>Nous avons bien reçu votre fiche d'inscription au TEF.</p>
               <p>Votre fiche est en pièce jointe. Conservez-la pour vos archives.</p>
+              <div style="background:#f0f4ff;border-left:4px solid #2e73b6;padding:12px 16px;margin:16px 0;border-radius:4px;">
+                <p style="margin:0;font-weight:600;color:#2e2060;">Mode de paiement :</p>
+                ${data.paiement === 'etransfer'
+                  ? '<p style="margin:8px 0 0;">Veuillez effectuer votre paiement par <strong>E-transfer</strong> à l\'adresse :<br><a href=\"mailto:info@mlicanada.ca\" style=\"color:#2e73b6;\">info@mlicanada.ca</a></p>'
+                  : data.paiement === 'carte_credit'
+                  ? '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer par <strong>carte de crédit</strong>.</p>'
+                  : '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer en <strong>espèces</strong>.</p>'
+                }
+              </div>
               <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
               <p style="font-size:13px;color:#555">
                 <strong>Montreal Language Institute</strong><br>
