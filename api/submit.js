@@ -160,7 +160,7 @@ async function buildPDF(data) {
   sectionBar('Règlement');
   field("Montant de l'inscription", data.montant || '', 40, 150);
   y -= 26;
-  ['etransfer:E-transfer','carte_credit:Carte de crédit (à l\'école)','especes:Espèces (à l\'école)'].forEach((p, i) => {
+  ['etransfer:Virement électronique','carte_credit:Carte de crédit (à l\'école)','especes:Espèces (à l\'école)'].forEach((p, i) => {
     const [val, label] = p.split(':');
     const tick = data.paiement === val ? '(*)' : '( )';
     page.drawText(tick + ' ' + label, { x: 40 + i * 130, y, font: fontReg, size: 10, color: rgb(0.2, 0.2, 0.2) });
@@ -244,7 +244,7 @@ module.exports = async (req, res) => {
               <div style="background:#f0f4ff;border-left:4px solid #2e73b6;padding:12px 16px;margin:16px 0;border-radius:4px;">
                 <p style="margin:0;font-weight:600;color:#2e2060;">Mode de paiement :</p>
                 ${data.paiement === 'etransfer'
-                  ? '<p style="margin:8px 0 0;">Veuillez effectuer votre paiement par <strong>E-transfer</strong> à l\'adresse :<br><a href=\"mailto:info@mlicanada.ca\" style=\"color:#2e73b6;\">info@mlicanada.ca</a></p>'
+                  ? '<p style="margin:8px 0 0;">Veuillez effectuer votre paiement par <strong>virement électronique</strong> à l\'adresse :<br><a href=\"mailto:info@mlicanada.ca\" style=\"color:#2e73b6;\">info@mlicanada.ca</a></p>'
                   : data.paiement === 'carte_credit'
                   ? '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer par <strong>carte de crédit</strong>.</p>'
                   : '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer en <strong>espèces</strong>.</p>'
