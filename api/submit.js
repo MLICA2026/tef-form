@@ -86,7 +86,7 @@ async function buildPDF(data) {
     iy -= 13;
     const selected = Array.isArray(data[col.key]) ? data[col.key] : (data[col.key] ? [data[col.key]] : []);
     col.items.forEach(item => {
-      const tick = selected.includes(item) ? '\u2611' : '\u2610';
+      const tick = selected.includes(item) ? '[X]' : '[ ]';
       page.drawText(tick + ' ' + (labels[item] || item), { x: cx, y: iy, font: fontReg, size: 8, color: rgb(0.2, 0.2, 0.2) });
       iy -= 12;
     });
@@ -96,7 +96,7 @@ async function buildPDF(data) {
   // ── état civil ────────────────────────────────────────────────────────────
   sectionBar('État civil');
   ['Madame','Monsieur','Non-binaire'].forEach((c, i) => {
-    const tick = data.civilite === c ? '\u25CF' : '\u25CB';
+    const tick = data.civilite === c ? '(*)' : '( )';
     page.drawText(tick + ' ' + c, { x: 40 + i * 100, y, font: fontReg, size: 10, color: rgb(0.2, 0.2, 0.2) });
   });
   y -= 20;
@@ -139,7 +139,7 @@ async function buildPDF(data) {
   motivItems.forEach(([val, label], i) => {
     const col = i % 3;
     const row = Math.floor(i / 3);
-    const tick = selectedMotiv.includes(val) ? '\u2611' : '\u2610';
+    const tick = selectedMotiv.includes(val) ? '[X]' : '[ ]';
     page.drawText(tick + ' ' + label, {
       x: 40 + col * motivColW,
       y: y - row * 14,
@@ -154,13 +154,13 @@ async function buildPDF(data) {
   y -= 26;
   ['cheque:Chèque','carte_credit:Carte de crédit','especes:Espèces'].forEach((p, i) => {
     const [val, label] = p.split(':');
-    const tick = data.paiement === val ? '\u25CF' : '\u25CB';
+    const tick = data.paiement === val ? '(*)' : '( )';
     page.drawText(tick + ' ' + label, { x: 40 + i * 130, y, font: fontReg, size: 10, color: rgb(0.2, 0.2, 0.2) });
   });
   y -= 20;
-  page.drawText('\u2611 Certifie avoir pris connaissance des conditions et les accepter.', { x: 40, y, font: fontReg, size: 8, color: rgb(0.4,0.4,0.4) });
+  page.drawText('[X] Certifie avoir pris connaissance des conditions et les accepter.', { x: 40, y, font: fontReg, size: 8, color: rgb(0.4,0.4,0.4) });
   y -= 12;
-  page.drawText("\u2611 Certifie sur l'honneur l'exactitude des renseignements fournis.", { x: 40, y, font: fontReg, size: 8, color: rgb(0.4,0.4,0.4) });
+  page.drawText("[X] Certifie sur l'honneur l'exactitude des renseignements fournis.", { x: 40, y, font: fontReg, size: 8, color: rgb(0.4,0.4,0.4) });
   y -= 24;
 
   field('Signé à', data.signe_a, 40, 180);
