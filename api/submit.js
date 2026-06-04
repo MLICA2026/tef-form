@@ -241,15 +241,7 @@ module.exports = async (req, res) => {
               <h2 style="color:#2e2060;margin-top:0">Bonjour ${data.prenom || ''},</h2>
               <p>Nous avons bien reçu votre fiche d'inscription au TEF.</p>
               <p>Votre fiche est en pièce jointe. Conservez-la pour vos archives.</p>
-              <div style="background:#f0f4ff;border-left:4px solid #2e73b6;padding:12px 16px;margin:16px 0;border-radius:4px;">
-                <p style="margin:0;font-weight:600;color:#2e2060;">Mode de paiement :</p>
-                ${data.paiement === 'etransfer'
-                  ? '<p style="margin:8px 0 0;">Veuillez effectuer votre paiement par <strong>virement électronique</strong> à l\'adresse :<br><a href=\"mailto:info@mlicanada.ca\" style=\"color:#2e73b6;\">info@mlicanada.ca</a></p>'
-                  : data.paiement === 'carte_credit'
-                  ? '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer par <strong>carte de crédit</strong>.</p>'
-                  : '<p style="margin:8px 0 0;">Veuillez vous présenter <strong>à l\'école</strong> pour payer en <strong>espèces</strong>.</p>'
-                }
-              </div>
+              <p>Un membre de notre équipe vous contactera dans un délai de <strong>3 à 5 jours ouvrables</strong>.</p>
               <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
               <p style="font-size:13px;color:#555">
                 <strong>Montreal Language Institute</strong><br>
