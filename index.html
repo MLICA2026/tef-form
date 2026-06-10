@@ -250,6 +250,7 @@ function populateSessionDates() {
   const dates = getLastSaturdays(8);
   const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const fullDates = ['2026-06-27']; // dates marquées comme complètes
+  const limitedDates = {'2026-07-25': 7}; // dates avec places limitées
   dates.forEach(d => {
     const opt = document.createElement('option');
     const value = d.toISOString().split('T')[0];
@@ -260,6 +261,8 @@ function populateSessionDates() {
       opt.disabled = true;
       opt.dataset.full = 'true';
       opt.style.color = '#aaa';
+    } else if (limitedDates[value] !== undefined) {
+      opt.textContent = label + ` — ${limitedDates[value]} place(s) restante(s)`;
     } else {
       opt.textContent = label;
     }
