@@ -249,12 +249,20 @@ function populateSessionDates() {
   const sel = document.getElementById('session_date');
   const dates = getLastSaturdays(8);
   const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const fullDates = ['2026-06-27']; // dates marquées comme complètes
   dates.forEach(d => {
     const opt = document.createElement('option');
-    const label = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     const value = d.toISOString().split('T')[0];
+    const label = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     opt.value = value;
-    opt.textContent = label;
+    if (fullDates.includes(value)) {
+      opt.textContent = label + ' — COMPLET';
+      opt.disabled = true;
+      opt.dataset.full = 'true';
+      opt.style.color = '#aaa';
+    } else {
+      opt.textContent = label;
+    }
     sel.appendChild(opt);
   });
 }
@@ -273,6 +281,15 @@ document.querySelectorAll('.price-check').forEach(c => {
 
 document.getElementById('form').addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  // Validate: session date not full
+  const selDate = document.getElementById('session_date');
+  const selOpt = selDate.options[selDate.selectedIndex];
+  if (!selDate.value || (selOpt && selOpt.dataset.full === 'true')) {
+    document.getElementById('msgError').textContent = '❌ Cette date est complète. Veuillez choisir une autre session.';
+    document.getElementById('msgError').style.display = 'block';
+    return;
+  }
 
   // Validate: at least one exam checked
   const examChecked = document.querySelectorAll('input[name="tefaq"]:checked, input[name="tefcanada"]:checked');
